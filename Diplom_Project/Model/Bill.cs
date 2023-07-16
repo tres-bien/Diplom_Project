@@ -1,11 +1,14 @@
-﻿namespace Diplom_Project
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace Diplom_Project
 {
-    public class Bill : IBillIdentifier, IBill, IBillPropertys
+    public class Bill : IBillIdentifier, IBill
     {
-        public int Id { get; set; }
+        [Key]
+        public int BillId { get; set; }
         public string Name { get; set; } = string.Empty;
         public double Total { get; set; }
-        public string AmountPaid { get; set; } = string.Empty;
-        public string Member { get; set; } = string.Empty;
+        public List<Member> Members { get; set; } = new List<Member>();
     }
 }

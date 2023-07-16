@@ -12,33 +12,30 @@ namespace Diplom_Project
             _context = context;
         }
 
-        public async Task<Bill> CreateBill(CreateBillRespond newBillRespond)
+        public async Task<Bill> CreateBill(Bill newBillRespond)
         {
-            string members = string.Empty;
-            string amountPaid = string.Empty;
+            //var a = newBillRespond.Members.Select(x => x.FirstName);
+            //var bill = new Bill
+            //{
+            //    Name = newBillRespond.Name,
+            //    Members = newBillRespond.Members.Select(member => new Member
+            //    {
+            //        FirstName = member.FirstName,
+            //        LastName = member.LastName,
+            //        AmountPaid = member.AmountPaid,
+            //    }).ToList(),
+            //    Total = newBillRespond.Total
+            //};
 
-            foreach (var member in newBillRespond.Members)
-            {
-                members += member.Member + ";";
-                amountPaid += member.AmountPaid + ";";
-            }
-
-            var bill = new Bill
-            {
-                Name = newBillRespond.Name,
-                Member = members,
-                AmountPaid = amountPaid,
-                Total = newBillRespond.Total
-            };
-            _context.Bill.Add(bill);
+            _context.Bill.Add(newBillRespond);
 
             await _context.SaveChangesAsync();
-            return bill;
+            return newBillRespond;
         }
 
         public async Task<List<Bill>?> GetAllBills()
         {
-            return await _context.Bill.ToListAsync();
+            return await _context.Bill.Include(x => x.Members).ToListAsync();
         }
 
         public async Task<List<Bill>?> GetBillByName(string name)
@@ -76,8 +73,10 @@ namespace Diplom_Project
 
         public async Task<List<Bill>?> Clear()
         {
-            var dbSet = _context.Set<Bill>();
-            dbSet.RemoveRange(dbSet);
+            //var dbSet = _context.Set<Bill>();
+            await _context.Database.EnsureDeletedAsync();
+            await _context.Database.EnsureCreatedAsync();
+            //dbSet.RemoveRange(dbSet);
             await _context.SaveChangesAsync();
 
             return await _context.Bill.ToListAsync();
@@ -85,20 +84,10 @@ namespace Diplom_Project
 
         public async Task<Bill> UpdateBillById(int id, CreateBillRespond request)
         {
-            string members = string.Empty;
-            string amountPaid = string.Empty;
-
             var bill = await GetById(id);
 
-            foreach (var member in request.Members)
-            {
-                members += member.Member + ";";
-                amountPaid += member.AmountPaid + ";";
-            }
-
             bill!.Name = request.Name;
-            bill.Member = members;
-            bill.AmountPaid = amountPaid;
+            bill.Members = request.Members.Cast<Member>().ToList();
             bill.Total = request.Total;
 
             await _context.SaveChangesAsync();

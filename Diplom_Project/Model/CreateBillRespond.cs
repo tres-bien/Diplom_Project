@@ -2,12 +2,10 @@
 
 namespace Diplom_Project
 {
-    public class CreateBillRespond : IBill
+    public class CreateBillRespond
     {
         public string Name { get; set; } = string.Empty;
         public double Total { get; set; }
-
-        [JsonConverter(typeof(BillPropertysConverter))]
-        public List<IBillPropertys> Members { get; set; }
+        public List<Member> Members { get; set; } = new List<Member>();
     }
 }
