@@ -28,6 +28,19 @@ namespace Diplom_Project
 
             app.UseAuthorization();
 
+            app.Use(async (context, next) =>
+            {
+                try
+                {
+                    Console.WriteLine($"{context.Request.Path}");
+                    await next();
+                    Console.WriteLine($"{context.Request.Path}");
+                }
+                catch (Exception ex)
+                {
+                    await Console.Out.WriteLineAsync(ex.Message);
+                }
+            });
 
             app.MapControllers();
             app.MapGet("/v2/CleareAll", (HttpContext reqestDelegate) =>

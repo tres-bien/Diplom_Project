@@ -2,6 +2,6 @@
 {
     public interface IBillIdentifier
     {
-        int Id { get; set; }
+        int BillId { get; set; }
     }
 }

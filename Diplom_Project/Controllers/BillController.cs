@@ -6,6 +6,7 @@ namespace Diplom_Project.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [LogFilter]
     public class BillController : ControllerBase
     {
         private readonly IBillService _billService;
@@ -38,10 +39,10 @@ namespace Diplom_Project.Controllers
 
         [HttpPost]
         [Route("CreateBill")]
-        public async Task<ActionResult<List<Bill>>> CreateBill(CreateBillRespond newBillRespond)
+        public async Task<ActionResult<Bill>> CreateBill(Bill newBillRespond)
         {
-            await _billService.CreateBill(newBillRespond);
-            return Ok(_billService);
+            var bill = await _billService.CreateBill(newBillRespond);
+            return CreatedAtAction(nameof(GetBillById), new { id = bill.BillId }, bill);
         }
 
         [HttpDelete("{name}")]
