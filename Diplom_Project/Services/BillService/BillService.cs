@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Azure.Core;
+using Microsoft.EntityFrameworkCore;
 using System;
 
 namespace Diplom_Project
@@ -14,19 +15,6 @@ namespace Diplom_Project
 
         public async Task<Bill> CreateBill(Bill newBillRespond)
         {
-            //var a = newBillRespond.Members.Select(x => x.FirstName);
-            //var bill = new Bill
-            //{
-            //    Name = newBillRespond.Name,
-            //    Members = newBillRespond.Members.Select(member => new Member
-            //    {
-            //        FirstName = member.FirstName,
-            //        LastName = member.LastName,
-            //        AmountPaid = member.AmountPaid,
-            //    }).ToList(),
-            //    Total = newBillRespond.Total
-            //};
-
             _context.Bill.Add(newBillRespond);
 
             await _context.SaveChangesAsync();
@@ -66,6 +54,7 @@ namespace Diplom_Project
         {
             var bill = await GetById(id);
             _context.Bill.Remove(bill!);
+
             await _context.SaveChangesAsync();
 
             return await _context.Bill.ToListAsync();
@@ -73,22 +62,40 @@ namespace Diplom_Project
 
         public async Task<List<Bill>?> Clear()
         {
-            //var dbSet = _context.Set<Bill>();
             await _context.Database.EnsureDeletedAsync();
             await _context.Database.EnsureCreatedAsync();
-            //dbSet.RemoveRange(dbSet);
             await _context.SaveChangesAsync();
 
             return await _context.Bill.ToListAsync();
         }
 
-        public async Task<Bill> UpdateBillById(int id, CreateBillRespond request)
+        public async Task<Bill> UpdateBillById(int id, Bill request)
         {
             var bill = await GetById(id);
 
             bill!.Name = request.Name;
-            bill.Members = request.Members.Cast<Member>().ToList();
             bill.Total = request.Total;
+
+            foreach (var memberRequest in request.Members)
+            {
+                var existingMember = bill.Members.FirstOrDefault(m => m.BillId == memberRequest.BillId);
+
+                if (existingMember != null)
+                {
+                    _context.Entry(existingMember).CurrentValues.SetValues(memberRequest);
+                }
+                else
+                {
+                    bill.Members.Add(memberRequest);
+                }
+            }
+
+            var memberIdsInRequest = request.Members.Select(m => m.BillId).ToList();
+            var membersToRemove = bill.Members.Where(m => !memberIdsInRequest.Contains(m.BillId)).ToList();
+            foreach (var memberToRemove in membersToRemove)
+            {
+                bill.Members.Remove(memberToRemove);
+            }
 
             await _context.SaveChangesAsync();
 
@@ -104,8 +111,15 @@ namespace Diplom_Project
 
         private async Task<Bill?> GetById(int id)
         {
-            var bill = await _context.Bill.FindAsync(id);
-            if (bill == null) return null;
+            var bill = await _context.Bill
+                .Include(b => b.Members)
+                .FirstOrDefaultAsync(b => b.Id == id);
+
+            if (bill == null)
+            {
+                return null;
+            }
+
             return bill;
         }
     }
