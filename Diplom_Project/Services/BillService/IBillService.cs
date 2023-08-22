@@ -10,7 +10,7 @@ namespace Diplom_Project
         Task<Bill> CreateBill(Bill newBillRespond);
         Task<List<Bill>?> RemoveBillByName(string name);
         Task<List<Bill>?> RemoveBillById(int id);
-        Task<Bill> UpdateBillById(int id, CreateBillRespond request);
+        Task<Bill> UpdateBillById(int id, Bill request);
         Task<List<Bill>?> Clear();
     }
 }

@@ -5,7 +5,11 @@ namespace Diplom_Project
 {
     public class DataContext : DbContext
     {
-        public DataContext(DbContextOptions<DataContext> options) : base(options) => Database.EnsureCreated();
+        public DataContext(DbContextOptions<DataContext> options) : base(options)
+        {
+
+        }
+
         public DbSet<Bill> Bill => Set<Bill>();
         public DbSet<Member> Members => Set<Member>();
 
@@ -17,12 +21,11 @@ namespace Diplom_Project
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            //modelBuilder.Entity<Bill>()
-            //            .HasMany(member => member.Members)
-            //            .WithOne(member => member.Bill)
-            //            .HasForeignKey(member => member.BillId)
-            //            .IsRequired(false);
-            modelBuilder.Entity<Member>().ToTable("Member");
+            modelBuilder.Entity<Member>()
+                                         .HasOne(m => m.Bill)
+                                         .WithMany(b => b.Members)
+                                         .HasForeignKey(m => m.BillId)
+                                         .OnDelete(DeleteBehavior.Cascade);
         }
 
     }

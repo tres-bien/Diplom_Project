@@ -6,20 +6,22 @@ namespace Diplom_Project.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [LogFilter]
     public class BillController : ControllerBase
     {
         private readonly IBillService _billService;
+        private readonly ILogger<BillController> _logger;
 
-        public BillController(IBillService billService)
+        public BillController(IBillService billService, ILogger<BillController> logger)
         {
             _billService = billService;
+            _logger = logger;
         }
 
         [HttpGet]
         [Route("GetAll")]
         public async Task<ActionResult<List<Bill>?>> GetAllBills()
         {
+            _logger.LogInformation("GET ALL BILLS");
             return await _billService.GetAllBills();
         }
 
@@ -42,7 +44,7 @@ namespace Diplom_Project.Controllers
         public async Task<ActionResult<Bill>> CreateBill(Bill newBillRespond)
         {
             var bill = await _billService.CreateBill(newBillRespond);
-            return CreatedAtAction(nameof(GetBillById), new { id = bill.BillId }, bill);
+            return CreatedAtAction(nameof(GetBillById), new { id = bill.Id }, bill);
         }
 
         [HttpDelete("{name}")]
@@ -74,7 +76,7 @@ namespace Diplom_Project.Controllers
         }
         
         [HttpPut("{id:int}")]
-        public async Task<ActionResult<Bill>> UpdateBillById(int id, CreateBillRespond request)
+        public async Task<ActionResult<Bill>> UpdateBillById(int id, Bill request)
         {
             var bill = await _billService.UpdateBillById(id, request);
             if (bill == null)

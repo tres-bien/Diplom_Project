@@ -6,7 +6,7 @@ namespace Diplom_Project
     public class Bill : IBillIdentifier, IBill
     {
         [Key]
-        public int BillId { get; set; }
+        public int Id { get; set; }
         public string Name { get; set; } = string.Empty;
         public double Total { get; set; }
         public List<Member> Members { get; set; } = new List<Member>();
