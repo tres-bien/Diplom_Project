@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Azure.Core;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -14,16 +16,31 @@ namespace Diplom_Project
         private readonly string issuer;
         private readonly string audience;
         private readonly string secret;
-        public LoginController(IConfiguration configuration)
+        private readonly DataContext _context;
+        public LoginController(IConfiguration configuration, DataContext context)
         {
             secret = configuration.GetValue<string>("Auth:Secret")!;
             issuer = configuration.GetValue<string>("Auth:Issuer")!;
             audience = configuration.GetValue<string>("Auth:Audience")!;
+            _context = context;
         }
 
         [HttpPost]
-        public string GenerateToken([FromBody] LoginModel request)
+        public ActionResult<string> GenerateToken([FromBody] LoginModel request)
         {
+            var user = _context.Users.Where(x => x.UserName == request.UserName && x.Password == request.Password);
+            string role = "User";
+
+            if (user.Count() == 0)
+            {
+                return Unauthorized();
+            }
+
+            if (user.Select(x => x.IsAdmin == true).FirstOrDefault())
+            {
+                role = "Admin";
+            }
+
             var mySecurityKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(secret));
 
             var myIssuer = issuer;
@@ -35,7 +52,7 @@ namespace Diplom_Project
                 Subject = new ClaimsIdentity(new Claim[]
                 {
                     new Claim(ClaimTypes.NameIdentifier, request.UserName),
-                    new Claim(ClaimTypes.Role, "User"),
+                    new Claim(ClaimTypes.Role, role),
                 }),
                 Expires = DateTime.UtcNow.AddDays(7),
                 Issuer = issuer,
@@ -48,7 +65,7 @@ namespace Diplom_Project
         }
 
         [HttpGet]
-        public bool VerifyToken(string token)
+        public ActionResult<bool> VerifyToken(string token)
         {
             var mySecurityKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(secret));
 
