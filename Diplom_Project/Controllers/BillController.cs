@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 
@@ -41,6 +42,7 @@ namespace Diplom_Project.Controllers
 
         [HttpPost]
         [Route("CreateBill")]
+        [Authorize(Roles = "User,Admin")]
         public async Task<ActionResult<Bill>> CreateBill(Bill newBillRespond)
         {
             var bill = await _billService.CreateBill(newBillRespond);

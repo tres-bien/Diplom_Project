@@ -76,25 +76,11 @@ namespace Diplom_Project
             bill!.Name = request.Name;
             bill.Total = request.Total;
 
+            bill.Members.Clear();
+
             foreach (var memberRequest in request.Members)
             {
-                var existingMember = bill.Members.FirstOrDefault(m => m.BillId == memberRequest.BillId);
-
-                if (existingMember != null)
-                {
-                    _context.Entry(existingMember).CurrentValues.SetValues(memberRequest);
-                }
-                else
-                {
-                    bill.Members.Add(memberRequest);
-                }
-            }
-
-            var memberIdsInRequest = request.Members.Select(m => m.BillId).ToList();
-            var membersToRemove = bill.Members.Where(m => !memberIdsInRequest.Contains(m.BillId)).ToList();
-            foreach (var memberToRemove in membersToRemove)
-            {
-                bill.Members.Remove(memberToRemove);
+                bill.Members.Add(memberRequest);
             }
 
             await _context.SaveChangesAsync();

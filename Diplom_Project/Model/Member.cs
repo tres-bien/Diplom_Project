@@ -11,6 +11,8 @@ namespace Diplom_Project
         public string FirstName { get; set; } = string.Empty;
         public string LastName { get; set; } = string.Empty;
         public double AmountPaid { get; set; }
+
+        [JsonIgnore]
         public int BillId { get; }
 
         [ForeignKey("BillId")]
