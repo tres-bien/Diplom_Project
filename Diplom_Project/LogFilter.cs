@@ -18,7 +18,7 @@ namespace Diplom_Project
 
         public void OnActionExecuting(ActionExecutingContext context)
         {
-            Console.WriteLine($"{context.HttpContext.Request.Path}");
+            Logger.LogInformation($"{context.HttpContext.Request.Path}");
         }
     }
 }
