@@ -12,6 +12,7 @@ namespace Diplom_Project
 
         public DbSet<Bill> Bill => Set<Bill>();
         public DbSet<Member> Members => Set<Member>();
+        public DbSet<LoginModel> Users => Set<LoginModel>();
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

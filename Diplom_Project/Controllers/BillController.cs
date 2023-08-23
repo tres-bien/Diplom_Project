@@ -71,6 +71,7 @@ namespace Diplom_Project.Controllers
 
         [HttpDelete]
         [Route("Clear")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Bill>> Clear()
         {
             await _billService.Clear();
