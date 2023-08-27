@@ -1,4 +1,5 @@
 ﻿using Azure.Core;
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using System;
 
@@ -90,16 +91,17 @@ namespace Diplom_Project
 
         private async Task<List<Bill>> GetByName(string name)
         {
-            var bill = await _context.Bill.Where(x => x.Name == name).ToListAsync();
+            var bill = await _context.Bill.Include(x => x.Members)
+                                          .Where(x => x.Name == name)
+                                          .ToListAsync();
             if (bill == null) return null!;
             return bill;
         }
 
         private async Task<Bill?> GetById(int id)
         {
-            var bill = await _context.Bill
-                .Include(b => b.Members)
-                .FirstOrDefaultAsync(b => b.Id == id);
+            var bill = await _context.Bill.Include(b => b.Members)
+                                          .FirstOrDefaultAsync(b => b.Id == id);
 
             if (bill == null)
             {
