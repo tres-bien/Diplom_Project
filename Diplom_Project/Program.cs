@@ -1,9 +1,12 @@
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Serilog;
+using System.Reflection;
 using System.Text;
 
 namespace Diplom_Project
@@ -29,6 +32,12 @@ namespace Diplom_Project
             // Add services to the container.
 
             builder.Services.AddControllers();
+
+            builder.Services.AddFluentValidationAutoValidation();
+            builder.Services.AddFluentValidationClientsideAdapters();
+            builder.Services.AddValidatorsFromAssemblyContaining<BillValidator>();
+
+            builder.Services.AddCors();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(c =>
@@ -84,6 +93,7 @@ namespace Diplom_Project
                 };
             });
             builder.Services.AddAuthorization();
+            builder.Services.AddValidatorsFromAssemblyContaining<BillValidator>();
             builder.Services.AddScoped<IBillService, BillService>();
             builder.Services.AddDbContext<DataContext>();
 
@@ -95,6 +105,13 @@ namespace Diplom_Project
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
+
+            app.UseCors(builder =>
+            {
+                builder.AllowAnyOrigin()
+                       .AllowAnyMethod()
+                       .AllowAnyHeader();
+            });
 
             app.UseHttpsRedirection();
 
