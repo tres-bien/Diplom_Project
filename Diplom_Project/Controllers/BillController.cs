@@ -45,8 +45,10 @@ namespace Diplom_Project.Controllers
         [Authorize(Roles = "User,Admin")]
         public async Task<ActionResult<Bill>> CreateBill(Bill newBillRespond)
         {
+            if (ModelState.IsValid)
+                return null!;
             var bill = await _billService.CreateBill(newBillRespond);
-            return CreatedAtAction(nameof(GetBillById), new { id = bill.Id }, bill);
+            return bill;
         }
 
         [HttpDelete("{name}")]

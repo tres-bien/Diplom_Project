@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 
-namespace Diplom_Project.Model.Validators
+namespace Diplom_Project
 {
     public class MemberValidator : AbstractValidator<Member>
     {

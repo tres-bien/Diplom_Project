@@ -36,6 +36,7 @@ namespace Diplom_Project
             builder.Services.AddFluentValidationAutoValidation();
             builder.Services.AddFluentValidationClientsideAdapters();
             builder.Services.AddValidatorsFromAssemblyContaining<BillValidator>();
+            builder.Services.AddValidatorsFromAssemblyContaining<MemberValidator>();
 
             builder.Services.AddCors();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -95,6 +96,8 @@ namespace Diplom_Project
             builder.Services.AddAuthorization();
             builder.Services.AddValidatorsFromAssemblyContaining<BillValidator>();
             builder.Services.AddScoped<IBillService, BillService>();
+            builder.Services.AddScoped<IValidator<Bill>, BillValidator>();
+            builder.Services.AddScoped<IValidator<Member>, MemberValidator>();
             builder.Services.AddDbContext<DataContext>();
 
             var app = builder.Build();
