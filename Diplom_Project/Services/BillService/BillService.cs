@@ -16,6 +16,8 @@ namespace Diplom_Project
 
         public async Task<Bill> CreateBill(Bill newBillRespond)
         {
+            
+
             _context.Bill.Add(newBillRespond);
 
             await _context.SaveChangesAsync();
